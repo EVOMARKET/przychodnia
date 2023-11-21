@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PatientRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PatientRepository::class)]
@@ -19,8 +21,14 @@ class Patient
     #[ORM\Column(length: 255)]
     private ?string $lastName = null;
 
-    #[ORM\ManyToOne(inversedBy: 'patient')]
-    private ?Visit $visit = null;
+    #[ORM\OneToMany(mappedBy: 'patient', targetEntity: Visit::class, orphanRemoval: true)]
+    private Collection $visits;
+
+    public function __construct()
+    {
+        $this->visits = new ArrayCollection();
+    }
+
 
     public function getId(): ?int
     {
@@ -51,19 +59,38 @@ class Patient
         return $this;
     }
 
-    public function getVisit(): ?Visit
+    /**
+     * @return Collection<int, Visit>
+     */
+    public function getVisits(): Collection
     {
-        return $this->visit;
+        return $this->visits;
     }
 
-    public function setVisit(?Visit $visit): static
+    public function addVisit(Visit $visit): static
     {
-        $this->visit = $visit;
+        if (!$this->visits->contains($visit)) {
+            $this->visits->add($visit);
+            $visit->setPatient($this);
+        }
 
         return $this;
     }
+
+    public function removeVisit(Visit $visit): static
+    {
+        if ($this->visits->removeElement($visit)) {
+            // set the owning side to null (unless already changed)
+            if ($visit->getPatient() === $this) {
+                $visit->setPatient(null);
+            }
+        }
+
+        return $this;
+    } 
     public function __toString(): string
     {
-       return $this->lastName;
+        return $this->firstName . ' ' . $this->lastName;
     }
+   
 }

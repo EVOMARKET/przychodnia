@@ -23,15 +23,14 @@ class Visit
     private ?\DateTimeInterface $endDate = null;
 
     #[ORM\ManyToOne(inversedBy: 'visits')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Patient $patient = null;
+
+    #[ORM\ManyToOne(inversedBy: 'visits')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Doctor $doctor = null;
 
-    #[ORM\OneToMany(mappedBy: 'visit', targetEntity: Patient::class)]
-    private Collection $patient;
 
-    public function __construct()
-    {
-        $this->patient = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -62,6 +61,18 @@ class Visit
         return $this;
     }
 
+    public function getPatient(): ?Patient
+    {
+        return $this->patient;
+    }
+
+    public function setPatient(?Patient $patient): static
+    {
+        $this->patient = $patient;
+
+        return $this;
+    }
+
     public function getDoctor(): ?Doctor
     {
         return $this->doctor;
@@ -73,34 +84,12 @@ class Visit
 
         return $this;
     }
-
-    /**
-     * @return Collection<int, Patient>
-     */
-    public function getPatient(): Collection
+    public function __toString()
     {
-        return $this->patient;
+        return $this->startDate->format('Y-m-d h:i') . ' '
+            . $this->endDate->format('Y-m-d h:i') . ' '
+            . $this->patient->__toString();
     }
 
-    public function addPatient(Patient $patient): static
-    {
-        if (!$this->patient->contains($patient)) {
-            $this->patient->add($patient);
-            $patient->setVisit($this);
-        }
-
-        return $this;
-    }
-
-    public function removePatient(Patient $patient): static
-    {
-        if ($this->patient->removeElement($patient)) {
-            // set the owning side to null (unless already changed)
-            if ($patient->getVisit() === $this) {
-                $patient->setVisit(null);
-            }
-        }
-
-        return $this;
-    }
+   
 }

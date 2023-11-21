@@ -24,13 +24,15 @@ class Doctor
     #[ORM\ManyToOne(inversedBy: 'doctors')]
     private ?Specjalization $specjalizacja = null;
 
-    #[ORM\OneToMany(mappedBy: 'doctor', targetEntity: Visit::class)]
+    #[ORM\OneToMany(mappedBy: 'doctor', targetEntity: Visit::class, orphanRemoval: true)]
     private Collection $visits;
 
     public function __construct()
     {
         $this->visits = new ArrayCollection();
     }
+
+   
 
    
 
@@ -82,6 +84,7 @@ class Doctor
     {
         return $this->visits;
     }
+   
 
     public function addVisit(Visit $visit): static
     {
@@ -103,10 +106,13 @@ class Doctor
         }
 
         return $this;
-    } 
+    }
+
     public function __toString(): string
     {
-       return $this->lastName;
+        return $this->firstName . ' ' . $this->lastName. ' - ' .$this->specjalizacja->getName();
+        
     }
+   
     
 }

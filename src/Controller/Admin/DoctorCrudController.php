@@ -9,6 +9,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use Symfony\Bundle\MakerBundle\Doctrine\EntityDetails;
+
 
 class DoctorCrudController extends AbstractCrudController
 {
@@ -16,17 +21,25 @@ class DoctorCrudController extends AbstractCrudController
     {
         return Doctor::class;
     }
+    public function configureActions (Actions $actions): Actions
+    {
+            return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+    }
 
     
     public function configureFields(string $pageName): iterable
     {
         return [
           // IdField::new('id'),
-            TextField::new('firstName'),
-            TextField::new('lastName'),
+            TextField::new('firstName','Imię'),
+            TextField::new('lastName','Nazwisko'),
             AssociationField::new('specjalizacja')->renderAsNativeWidget(),
+            AssociationField::new('visits')->renderAsNativeWidget(),
+         
             
         ];
     }
+  
     
 }
